@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Will You Be My Valentine Ms.Laniog? 💙</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Quicksand:wght@400;600&family=Dancing+Script:wght@600&display=swap" rel="stylesheet">
+
+<style>
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #b8e8ff, #e6f6ff);
+  font-family: 'Quicksand', sans-serif;
+  text-align: center;
+  overflow: hidden;
+  position: relative;
+}
+
+h1 {
+  font-family: 'Pacifico', cursive;
+  font-size: 3rem;
+  color: #1e6fa3;
+  margin-top: 20px;
+  text-shadow: 1px 1px 3px #8fc1ff;
+}
+
+.container {
+  max-width: 900px;
+  margin: auto;
+  padding: 20px;
+}
+
+.card {
+  background: rgba(255,255,255,0.9);
+  border-radius: 25px;
+  padding: 25px;
+  margin: 30px 0;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+
+button {
+  background: #4da3ff;
+  color: white;
+  border: none;
+  padding: 14px 30px;
+  border-radius: 30px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  margin: 10px;
+  transition: transform 0.2s, font-size 0.2s;
+}
+button:hover { background: #2b8de5; }
+
+#noBtn { position: relative; }
+#yesBtn { transition: transform 0.3s ease, font-size 0.3s ease; }
+
+#score, #instructions {
+  font-size: 1.4rem;
+  color: #1e6fa3;
+  margin-top: 15px;
+}
+
+.gifs img {
+  width: 160px;
+  border-radius: 20px;
+  margin: 10px;
+}
+
+/* POP MESSAGES */
+.popMessage {
+  position: absolute;
+  color: #ff5e78;
+  font-weight: bold;
+  pointer-events: none;
+  animation: rise 1s forwards;
+  font-size: 1.2rem;
+  text-shadow: 1px 1px 3px white;
+}
+@keyframes rise {
+  0% { transform: translateY(0); opacity:1; }
+  100% { transform: translateY(-80px); opacity:0; }
+}
+
+/* POPUP MESSAGE */
+.popup {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.65);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+.popup.hidden { display: none; }
+
+.popup-content {
+  background: #fff;
+  padding: 45px;
+  border-radius: 25px;
+  max-width: 750px;
+  font-family: 'Dancing Script', cursive;
+  font-size: 2.6rem;
+  line-height: 1.4;
+  color: #1e6fa3;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+  animation: popupIn 0.7s ease forwards;
+}
+@keyframes popupIn {
+  from { transform: scale(0.6); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+/* PETALS */
+.petal {
+  position: fixed;
+  top: -20px;
+  font-size: 24px;
+  animation: fall linear forwards;
+  pointer-events: none;
+}
+@keyframes fall {
+  to {
+    transform: translateY(110vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<h1>Will You Be My Valentine? 💙</h1>
+
+<div class="container">
+
+  <div class="gifs">
+    <img src="https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif">
+    <img src="https://media.giphy.com/media/mlvseq9yvZhba/giphy.gif">
+    <img src="https://media.giphy.com/media/3oriO0OEd9QIDdllqo/giphy.gif">
+  </div>
+
+  <div id="instructions">Pop 10 hearts to unlock the YES button! 💙</div>
+  <div id="score">Hearts popped: 0</div>
+
+  <div class="card">
+    <h2>Mini-Game: Pop the Hearts 💘</h2>
+    <p>Click hearts as they appear! Playful messages await 🎉</p>
+  </div>
+
+  <div class="card">
+    <h2>So… 😳</h2>
+    <p>Will you be my Valentines Ms.Laniog??</p>
+    <button id="yesBtn" disabled>YES 💙</button>
+    <button id="noBtn">NOO:< 🙈</button>
+    <div id="finalMsg"></div>
+  </div>
+
+</div>
+
+<!-- POPUP -->
+<div id="popupMessage" class="popup hidden">
+  <div class="popup-content">
+    It all started with a bookmark…<br><br>
+    Now in this chapter of my life,<br>
+    <strong>you’re my most special part.</strong><br><br>
+    iloveyouu lots Mika!! 💙💌
+  </div>
+</div>
+
+<audio id="bgMusic" loop>
+  <source src="https://www.bensound.com/bensound-music/bensound-love.mp3" type="audio/mpeg">
+</audio>
+
+<audio id="popSound">
+  <source src="https://cdn.pixabay.com/audio/2022/03/15/audio_2c58c5b6e4.mp3">
+</audio>
+
+<script>
+let heartsPopped = 0;
+const totalHearts = 10;
+const messages = ["bleehhhh!", "iloveeyouuu!", "mikaaa!", "mwaahhhhh!", "nyeeenyeeeee!", "Sweet!", "Lovely!", "Mine!", "imissyouuu!", "💙"];
+
+const scoreDisplay = document.getElementById("score");
+const instructions = document.getElementById("instructions");
+const yesBtn = document.getElementById("yesBtn");
+const noBtn = document.getElementById("noBtn");
+const finalMsg = document.getElementById("finalMsg");
+const bgMusic = document.getElementById("bgMusic");
+const popSound = document.getElementById("popSound");
+
+// MUSIC
+document.body.addEventListener("click", () => {
+  bgMusic.volume = 0.5;
+  bgMusic.play().catch(()=>{});
+}, { once:true });
+
+// HEART SPAWN
+function spawnHeart() {
+  const heart = document.createElement("div");
+  heart.textContent = "💙";
+  heart.style.position = "fixed";
+  heart.style.left = Math.random() * (window.innerWidth - 40) + "px";
+  heart.style.top = Math.random() * (window.innerHeight - 40) + "px";
+  heart.style.fontSize = (24 + Math.random() * 20) + "px";
+  document.body.appendChild(heart);
+
+  heart.addEventListener("click", () => {
+    popSound.currentTime = 0;
+    popSound.play();
+    heartsPopped++;
+    scoreDisplay.innerText = `Hearts popped: ${heartsPopped}`;
+    spawnPopMessage(heart);
+    heart.remove();
+
+    if (heartsPopped >= totalHearts) {
+      yesBtn.disabled = false;
+      instructions.innerText = "You unlocked the YES button! 💘";
+    }
+  });
+
+  setTimeout(() => heart.remove(), 5000);
+}
+
+function spawnPopMessage(el) {
+  const msg = document.createElement("div");
+  msg.className = "popMessage";
+  msg.innerText = messages[Math.floor(Math.random()*messages.length)];
+  const r = el.getBoundingClientRect();
+  msg.style.left = r.left + "px";
+  msg.style.top = r.top + "px";
+  document.body.appendChild(msg);
+  setTimeout(() => msg.remove(), 1000);
+}
+
+setInterval(spawnHeart, 1200);
+
+// NO BUTTON
+noBtn.addEventListener("mouseenter", () => {
+  noBtn.style.left = Math.random()*window.innerWidth + "px";
+  noBtn.style.top = Math.random()*window.innerHeight + "px";
+  noBtn.style.position = "absolute";
+  yesBtn.style.transform = "scale(3)";
+});
+
+// PETALS
+function spawnPetal() {
+  const p = document.createElement("div");
+  p.className = "petal";
+  p.textContent = "🌸";
+  p.style.left = Math.random()*window.innerWidth + "px";
+  p.style.animationDuration = (4 + Math.random()*3) + "s";
+  document.body.appendChild(p);
+  setTimeout(()=>p.remove(),7000);
+}
+
+// YES CLICK
+yesBtn.addEventListener("click", () => {
+  finalMsg.innerHTML = "<h3>YAY!! 💌 You are my Valentines 😽💙</h3>";
+  for(let i=0;i<15;i++) spawnHeart();
+
+  setTimeout(() => {
+    document.getElementById("popupMessage").classList.remove("hidden");
+  }, 1500);
+
+  setInterval(spawnPetal, 400);
+});
+
+// CLOSE POPUP
+document.getElementById("popupMessage").addEventListener("click", () => {
+  document.getElementById("popupMessage").classList.add("hidden");
+});
+</script>
+
+</body>
+</html>
