@@ -15,7 +15,6 @@ body {
   font-family: 'Quicksand', sans-serif;
   text-align: center;
   overflow: hidden;
-  position: relative;
 }
 
 h1 {
@@ -23,7 +22,6 @@ h1 {
   font-size: 3rem;
   color: #1e6fa3;
   margin-top: 20px;
-  text-shadow: 1px 1px 3px #8fc1ff;
 }
 
 .container {
@@ -49,17 +47,16 @@ button {
   font-size: 1.1rem;
   cursor: pointer;
   margin: 10px;
-  transition: transform 0.2s, font-size 0.2s;
+  transition: transform 0.4s ease;
 }
 button:hover { background: #2b8de5; }
 
+#yesBtn { transition: transform 0.4s ease; }
 #noBtn { position: relative; }
-#yesBtn { transition: transform 0.3s ease, font-size 0.3s ease; }
 
 #score, #instructions {
   font-size: 1.4rem;
   color: #1e6fa3;
-  margin-top: 15px;
 }
 
 .gifs img {
@@ -68,22 +65,18 @@ button:hover { background: #2b8de5; }
   margin: 10px;
 }
 
-/* POP MESSAGES */
+/* HEART POP MESSAGE */
 .popMessage {
   position: absolute;
   color: #ff5e78;
   font-weight: bold;
-  pointer-events: none;
   animation: rise 1s forwards;
-  font-size: 1.2rem;
-  text-shadow: 1px 1px 3px white;
 }
 @keyframes rise {
-  0% { transform: translateY(0); opacity:1; }
-  100% { transform: translateY(-80px); opacity:0; }
+  to { transform: translateY(-80px); opacity: 0; }
 }
 
-/* POPUP MESSAGE */
+/* POPUP */
 .popup {
   position: fixed;
   inset: 0;
@@ -96,20 +89,12 @@ button:hover { background: #2b8de5; }
 .popup.hidden { display: none; }
 
 .popup-content {
-  background: #fff;
+  background: white;
   padding: 45px;
   border-radius: 25px;
-  max-width: 750px;
   font-family: 'Dancing Script', cursive;
   font-size: 2.6rem;
-  line-height: 1.4;
   color: #1e6fa3;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.25);
-  animation: popupIn 0.7s ease forwards;
-}
-@keyframes popupIn {
-  from { transform: scale(0.6); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
 }
 
 /* PETALS */
@@ -118,11 +103,25 @@ button:hover { background: #2b8de5; }
   top: -20px;
   font-size: 24px;
   animation: fall linear forwards;
-  pointer-events: none;
 }
 @keyframes fall {
   to {
     transform: translateY(110vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+/* CONFETTI */
+.confetti {
+  position: fixed;
+  width: 8px;
+  height: 8px;
+  animation: confettiFall 1.2s linear forwards;
+  z-index: 9999;
+}
+@keyframes confettiFall {
+  to {
+    transform: translateY(120vh) rotate(720deg);
     opacity: 0;
   }
 }
@@ -135,27 +134,26 @@ button:hover { background: #2b8de5; }
 
 <div class="container">
 
-  <div class="gifs">
-    <img src="https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif">
-    <img src="https://media.giphy.com/media/mlvseq9yvZhba/giphy.gif">
-    <img src="https://media.giphy.com/media/3oriO0OEd9QIDdllqo/giphy.gif">
-  </div>
+<div class="gifs">
+  <img src="https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif">
+  <img src="https://media.giphy.com/media/mlvseq9yvZhba/giphy.gif">
+  <img src="https://media.giphy.com/media/3oriO0OEd9QIDdllqo/giphy.gif">
+</div>
 
-  <div id="instructions">Pop 10 hearts to unlock the YES button! 💙</div>
-  <div id="score">Hearts popped: 0</div>
+<div id="instructions">Pop 10 hearts to unlock the YES button! 💙</div>
+<div id="score">Hearts popped: 0</div>
 
-  <div class="card">
-    <h2>Mini-Game: Pop the Hearts 💘</h2>
-    <p>Click hearts as they appear! Playful messages await 🎉</p>
-  </div>
+<div class="card">
+  <h2>Mini-Game: Pop the Hearts 💘</h2>
+</div>
 
-  <div class="card">
-    <h2>So… 😳</h2>
-    <p>Will you be my Valentines Ms.Laniog??</p>
-    <button id="yesBtn" disabled>YES 💙</button>
-    <button id="noBtn">NOO:< 🙈</button>
-    <div id="finalMsg"></div>
-  </div>
+<div class="card">
+  <h2>So… 😳</h2>
+  <p>Will you be my Valentines Ms.Laniog??</p>
+  <button id="yesBtn" disabled>YES 💙</button>
+  <button id="noBtn">NOO:< 🙈</button>
+  <div id="finalMsg"></div>
+</div>
 
 </div>
 
@@ -170,7 +168,7 @@ button:hover { background: #2b8de5; }
 </div>
 
 <audio id="bgMusic" loop>
-  <source src="https://www.bensound.com/bensound-music/bensound-love.mp3" type="audio/mpeg">
+  <source src="https://www.bensound.com/bensound-music/bensound-love.mp3">
 </audio>
 
 <audio id="popSound">
@@ -180,13 +178,11 @@ button:hover { background: #2b8de5; }
 <script>
 let heartsPopped = 0;
 const totalHearts = 10;
-const messages = ["bleehhhh!", "iloveeyouuu!", "mikaaa!", "mwaahhhhh!", "nyeeenyeeeee!", "Sweet!", "Lovely!", "Mine!", "imissyouuu!", "💙"];
 
 const scoreDisplay = document.getElementById("score");
 const instructions = document.getElementById("instructions");
 const yesBtn = document.getElementById("yesBtn");
 const noBtn = document.getElementById("noBtn");
-const finalMsg = document.getElementById("finalMsg");
 const bgMusic = document.getElementById("bgMusic");
 const popSound = document.getElementById("popSound");
 
@@ -196,81 +192,68 @@ document.body.addEventListener("click", () => {
   bgMusic.play().catch(()=>{});
 }, { once:true });
 
-// HEART SPAWN
+// HEARTS
 function spawnHeart() {
   const heart = document.createElement("div");
   heart.textContent = "💙";
   heart.style.position = "fixed";
-  heart.style.left = Math.random() * (window.innerWidth - 40) + "px";
-  heart.style.top = Math.random() * (window.innerHeight - 40) + "px";
-  heart.style.fontSize = (24 + Math.random() * 20) + "px";
+  heart.style.left = Math.random()*window.innerWidth+"px";
+  heart.style.top = Math.random()*window.innerHeight+"px";
+  heart.style.fontSize = "30px";
   document.body.appendChild(heart);
 
-  heart.addEventListener("click", () => {
+  heart.onclick = () => {
     popSound.currentTime = 0;
     popSound.play();
     heartsPopped++;
     scoreDisplay.innerText = `Hearts popped: ${heartsPopped}`;
-    spawnPopMessage(heart);
     heart.remove();
 
-    if (heartsPopped >= totalHearts) {
-      yesBtn.disabled = false;
-      instructions.innerText = "You unlocked the YES button! 💘";
-    }
-  });
+    if (heartsPopped === totalHearts) unlockYes();
+  };
 
-  setTimeout(() => heart.remove(), 5000);
+  setTimeout(()=>heart.remove(),5000);
 }
 
-function spawnPopMessage(el) {
-  const msg = document.createElement("div");
-  msg.className = "popMessage";
-  msg.innerText = messages[Math.floor(Math.random()*messages.length)];
-  const r = el.getBoundingClientRect();
-  msg.style.left = r.left + "px";
-  msg.style.top = r.top + "px";
-  document.body.appendChild(msg);
-  setTimeout(() => msg.remove(), 1000);
+setInterval(spawnHeart,1200);
+
+// UNLOCK YES + CONFETTI BURST
+function unlockYes() {
+  yesBtn.disabled = false;
+  instructions.innerText = "YES unlocked 💙";
+
+  // YES grows gently
+  yesBtn.style.transform = "scale(1.2)";
+
+  // NO confetti burst
+  const rect = noBtn.getBoundingClientRect();
+  burstConfetti(rect.left + rect.width/2, rect.top + rect.height/2);
+  noBtn.remove();
 }
 
-setInterval(spawnHeart, 1200);
-
-// NO BUTTON
-noBtn.addEventListener("mouseenter", () => {
-  noBtn.style.left = Math.random()*window.innerWidth + "px";
-  noBtn.style.top = Math.random()*window.innerHeight + "px";
-  noBtn.style.position = "absolute";
-  yesBtn.style.transform = "scale(3)";
-});
-
-// PETALS
-function spawnPetal() {
-  const p = document.createElement("div");
-  p.className = "petal";
-  p.textContent = "🌸";
-  p.style.left = Math.random()*window.innerWidth + "px";
-  p.style.animationDuration = (4 + Math.random()*3) + "s";
-  document.body.appendChild(p);
-  setTimeout(()=>p.remove(),7000);
+// CONFETTI
+function burstConfetti(x,y){
+  const colors = ["#ff5e78","#4da3ff","#ffd166","#06d6a0"];
+  for(let i=0;i<40;i++){
+    const c=document.createElement("div");
+    c.className="confetti";
+    c.style.background=colors[Math.floor(Math.random()*colors.length)];
+    c.style.left=x+"px";
+    c.style.top=y+"px";
+    document.body.appendChild(c);
+    setTimeout(()=>c.remove(),1200);
+  }
 }
 
 // YES CLICK
-yesBtn.addEventListener("click", () => {
-  finalMsg.innerHTML = "<h3>YAY!! 💌 You are my Valentines 😽💙</h3>";
-  for(let i=0;i<15;i++) spawnHeart();
-
-  setTimeout(() => {
-    document.getElementById("popupMessage").classList.remove("hidden");
-  }, 1500);
-
-  setInterval(spawnPetal, 400);
-});
+yesBtn.onclick = () => {
+  document.getElementById("popupMessage").classList.remove("hidden");
+};
 
 // CLOSE POPUP
-document.getElementById("popupMessage").addEventListener("click", () => {
+document.getElementById("popupMessage").onclick = () => {
   document.getElementById("popupMessage").classList.add("hidden");
-});
+};
 </script>
 
 </body>
