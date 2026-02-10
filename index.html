@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Will You Be My Valentine Ms.Laniog? 💙</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Quicksand:wght@400;600&family=Dancing+Script:wght@600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
 
 <style>
 body {
@@ -47,83 +47,67 @@ button {
   font-size: 1.1rem;
   cursor: pointer;
   margin: 10px;
-  transition: transform 0.4s ease;
+  transition: transform 0.3s ease;
 }
+
 button:hover { background: #2b8de5; }
 
-#yesBtn { transition: transform 0.4s ease; }
-#noBtn { position: relative; }
+#yesBtn { opacity: 0.6; }
+#yesBtn.unlocked {
+  opacity: 1;
+  transform: scale(1.15);
+}
 
 #score, #instructions {
   font-size: 1.4rem;
   color: #1e6fa3;
 }
 
-.gifs img {
-  width: 160px;
-  border-radius: 20px;
-  margin: 10px;
-}
-
-/* HEART POP MESSAGE */
 .popMessage {
   position: absolute;
   color: #ff5e78;
   font-weight: bold;
   animation: rise 1s forwards;
+  pointer-events: none;
 }
+
 @keyframes rise {
   to { transform: translateY(-80px); opacity: 0; }
 }
 
-/* POPUP */
-.popup {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.65);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
-}
-.popup.hidden { display: none; }
-
-.popup-content {
-  background: white;
-  padding: 45px;
-  border-radius: 25px;
-  font-family: 'Dancing Script', cursive;
-  font-size: 2.6rem;
-  color: #1e6fa3;
-}
-
-/* PETALS */
-.petal {
-  position: fixed;
-  top: -20px;
-  font-size: 24px;
-  animation: fall linear forwards;
-}
-@keyframes fall {
-  to {
-    transform: translateY(110vh) rotate(360deg);
-    opacity: 0;
-  }
-}
-
-/* CONFETTI */
 .confetti {
   position: fixed;
   width: 8px;
   height: 8px;
   animation: confettiFall 1.2s linear forwards;
-  z-index: 9999;
 }
+
 @keyframes confettiFall {
-  to {
-    transform: translateY(120vh) rotate(720deg);
-    opacity: 0;
-  }
+  to { transform: translateY(120vh) rotate(720deg); opacity: 0; }
+}
+
+.rain {
+  position: fixed;
+  top: -40px;
+  animation: fall linear forwards;
+}
+
+@keyframes fall {
+  to { transform: translateY(120vh); }
+}
+
+.bigMessage {
+  position: fixed;
+  inset: 0;
+  background: rgba(255,255,255,0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Pacifico', cursive;
+  font-size: 2.6rem;
+  color: #1e6fa3;
+  z-index: 9999;
+  padding: 30px;
 }
 </style>
 </head>
@@ -134,125 +118,128 @@ button:hover { background: #2b8de5; }
 
 <div class="container">
 
-<div class="gifs">
-  <img src="https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif">
-  <img src="https://media.giphy.com/media/mlvseq9yvZhba/giphy.gif">
-  <img src="https://media.giphy.com/media/3oriO0OEd9QIDdllqo/giphy.gif">
-</div>
-
-<div id="instructions">Pop 10 hearts to unlock the YES button! 💙</div>
+<div id="instructions">Pop 10 hearts to unlock YES 💙</div>
 <div id="score">Hearts popped: 0</div>
 
 <div class="card">
-  <h2>Mini-Game: Pop the Hearts 💘</h2>
+<h2>Pop the Hearts 💘</h2>
 </div>
 
 <div class="card">
-  <h2>So… 😳</h2>
-  <p>Will you be my Valentines Ms.Laniog??</p>
-  <button id="yesBtn" disabled>YES 💙</button>
-  <button id="noBtn">NOO:< 🙈</button>
-  <div id="finalMsg"></div>
+<p>Will you be my Valentines Ms.Laniog?</p>
+<button id="yesBtn" disabled>YES 💙</button>
+<button id="noBtn">NO 🙈</button>
+<div id="finalMsg"></div>
 </div>
 
-</div>
-
-<!-- POPUP -->
-<div id="popupMessage" class="popup hidden">
-  <div class="popup-content">
-    It all started with a bookmark…<br><br>
-    Now in this chapter of my life,<br>
-    <strong>you’re my most special part.</strong><br><br>
-    iloveyouu lots Mika!! 💙💌
-  </div>
 </div>
 
 <audio id="bgMusic" loop>
-  <source src="https://www.bensound.com/bensound-music/bensound-love.mp3">
+<source src="https://www.bensound.com/bensound-music/bensound-love.mp3">
 </audio>
 
 <audio id="popSound">
-  <source src="https://cdn.pixabay.com/audio/2022/03/15/audio_2c58c5b6e4.mp3">
+<source src="https://cdn.pixabay.com/audio/2022/03/15/audio_2c58c5b6e4.mp3">
 </audio>
 
 <script>
-let heartsPopped = 0;
-const totalHearts = 10;
-
-const scoreDisplay = document.getElementById("score");
+let hearts = 0;
+const total = 10;
+const messages = ["iloveyouu 💙","mwaah 😽","sweet!","mine 💕","cutieee","mikaaa"];
+const score = document.getElementById("score");
 const instructions = document.getElementById("instructions");
 const yesBtn = document.getElementById("yesBtn");
 const noBtn = document.getElementById("noBtn");
 const bgMusic = document.getElementById("bgMusic");
 const popSound = document.getElementById("popSound");
 
-// MUSIC
 document.body.addEventListener("click", () => {
   bgMusic.volume = 0.5;
   bgMusic.play().catch(()=>{});
-}, { once:true });
+},{once:true});
 
-// HEARTS
-function spawnHeart() {
-  const heart = document.createElement("div");
-  heart.textContent = "💙";
-  heart.style.position = "fixed";
-  heart.style.left = Math.random()*window.innerWidth+"px";
-  heart.style.top = Math.random()*window.innerHeight+"px";
-  heart.style.fontSize = "30px";
-  document.body.appendChild(heart);
+function spawnHeart(){
+  const h = document.createElement("div");
+  h.textContent = "💙";
+  h.style.position="fixed";
+  h.style.left=Math.random()*window.innerWidth+"px";
+  h.style.top=Math.random()*window.innerHeight+"px";
+  h.style.fontSize="30px";
+  document.body.appendChild(h);
 
-  heart.onclick = () => {
-    popSound.currentTime = 0;
+  h.onclick=()=>{
+    popSound.currentTime=0;
     popSound.play();
-    heartsPopped++;
-    scoreDisplay.innerText = `Hearts popped: ${heartsPopped}`;
-    heart.remove();
+    hearts++;
+    score.innerText=`Hearts popped: ${hearts}`;
+    popMsg(h);
+    h.remove();
 
-    if (heartsPopped === totalHearts) unlockYes();
+    if(hearts===total){
+      yesBtn.disabled=false;
+      yesBtn.classList.add("unlocked");
+      instructions.innerText="YES unlocked 💙";
+      popNoButton();
+    }
   };
+  setTimeout(()=>h.remove(),5000);
+}
 
-  setTimeout(()=>heart.remove(),5000);
+function popMsg(el){
+  const m=document.createElement("div");
+  m.className="popMessage";
+  m.innerText=messages[Math.floor(Math.random()*messages.length)];
+  m.style.left=el.offsetLeft+"px";
+  m.style.top=el.offsetTop+"px";
+  document.body.appendChild(m);
+  setTimeout(()=>m.remove(),1000);
 }
 
 setInterval(spawnHeart,1200);
 
-// UNLOCK YES + CONFETTI BURST
-function unlockYes() {
-  yesBtn.disabled = false;
-  instructions.innerText = "YES unlocked 💙";
+// NO BUTTON RUNS ON HOVER
+noBtn.addEventListener("mouseenter",()=>{
+  const x=Math.random()*(window.innerWidth-100);
+  const y=Math.random()*(window.innerHeight-50);
+  noBtn.style.position="absolute";
+  noBtn.style.left=x+"px";
+  noBtn.style.top=y+"px";
+});
 
-  // YES grows gently
-  yesBtn.style.transform = "scale(1.2)";
-
-  // NO confetti burst
-  const rect = noBtn.getBoundingClientRect();
-  burstConfetti(rect.left + rect.width/2, rect.top + rect.height/2);
-  noBtn.remove();
-}
-
-// CONFETTI
-function burstConfetti(x,y){
-  const colors = ["#ff5e78","#4da3ff","#ffd166","#06d6a0"];
-  for(let i=0;i<40;i++){
+function popNoButton(){
+  const rect=noBtn.getBoundingClientRect();
+  for(let i=0;i<25;i++){
     const c=document.createElement("div");
     c.className="confetti";
-    c.style.background=colors[Math.floor(Math.random()*colors.length)];
-    c.style.left=x+"px";
-    c.style.top=y+"px";
+    c.style.left=rect.left+"px";
+    c.style.top=rect.top+"px";
+    c.style.background=["#ff5e78","#4da3ff","#ffd166"][Math.floor(Math.random()*3)];
     document.body.appendChild(c);
     setTimeout(()=>c.remove(),1200);
   }
+  noBtn.remove();
 }
 
-// YES CLICK
-yesBtn.onclick = () => {
-  document.getElementById("popupMessage").classList.remove("hidden");
-};
+function rain(symbol,count){
+  for(let i=0;i<count;i++){
+    const r=document.createElement("div");
+    r.className="rain";
+    r.textContent=symbol;
+    r.style.left=Math.random()*window.innerWidth+"px";
+    r.style.fontSize="30px";
+    r.style.animationDuration=(3+Math.random()*3)+"s";
+    document.body.appendChild(r);
+    setTimeout(()=>r.remove(),6000);
+  }
+}
 
-// CLOSE POPUP
-document.getElementById("popupMessage").onclick = () => {
-  document.getElementById("popupMessage").classList.add("hidden");
+yesBtn.onclick=()=>{
+  rain("💙",40);
+  rain("🌸",30);
+  const msg=document.createElement("div");
+  msg.className="bigMessage";
+  msg.innerText="It all started with a bookmark… now in this chapter of my life, you're my most special part. I love you lots, Mika!! 💙";
+  document.body.appendChild(msg);
 };
 </script>
 
