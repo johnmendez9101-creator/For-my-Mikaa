@@ -24,51 +24,45 @@ h1 {
   margin-top: 20px;
 }
 
-.container {
-  max-width: 900px;
-  margin: auto;
-  padding: 20px;
-}
-
-.card {
-  background: rgba(255,255,255,0.9);
-  border-radius: 25px;
-  padding: 25px;
-  margin: 30px 0;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-}
-
 button {
-  background: #4da3ff;
-  color: white;
-  border: none;
   padding: 14px 30px;
-  border-radius: 30px;
   font-size: 1.1rem;
+  border-radius: 30px;
+  border: none;
   cursor: pointer;
   margin: 10px;
-  transition: transform 0.3s ease;
+  transition: all 0.3s ease;
 }
 
 button:hover { background: #2b8de5; }
 
-#yesBtn { opacity: 0.6; }
+#yesBtn {
+  background: #4da3ff;
+  color: white;
+  opacity: 0.6;
+}
 #yesBtn.unlocked {
   opacity: 1;
   transform: scale(1.15);
 }
 
+#noBtn {
+  background: #ff5e78;
+  color: white;
+}
+
 #score, #instructions {
   font-size: 1.4rem;
   color: #1e6fa3;
+  margin-top: 10px;
 }
 
 .popMessage {
   position: absolute;
   color: #ff5e78;
   font-weight: bold;
-  animation: rise 1s forwards;
   pointer-events: none;
+  animation: rise 1s forwards;
 }
 
 @keyframes rise {
@@ -116,30 +110,22 @@ button:hover { background: #2b8de5; }
 
 <h1>Will You Be My Valentine? 💙</h1>
 
-<div class="container">
-
 <div id="instructions">Pop 10 hearts to unlock YES 💙</div>
 <div id="score">Hearts popped: 0</div>
 
 <div class="card">
-<h2>Pop the Hearts 💘</h2>
-</div>
-
-<div class="card">
-<p>Will you be my Valentines Ms.Laniog?</p>
-<button id="yesBtn" disabled>YES 💙</button>
-<button id="noBtn">NO 🙈</button>
-<div id="finalMsg"></div>
-</div>
-
+  <p>Will you be my Valentines Ms.Laniog?</p>
+  <button id="yesBtn" disabled>YES 💙</button>
+  <button id="noBtn">NO 🙈</button>
+  <div id="finalMsg"></div>
 </div>
 
 <audio id="bgMusic" loop>
-<source src="https://www.bensound.com/bensound-music/bensound-love.mp3">
+  <source src="https://www.bensound.com/bensound-music/bensound-love.mp3">
 </audio>
 
 <audio id="popSound">
-<source src="https://cdn.pixabay.com/audio/2022/03/15/audio_2c58c5b6e4.mp3">
+  <source src="https://cdn.pixabay.com/audio/2022/03/15/audio_2c58c5b6e4.mp3">
 </audio>
 
 <script>
@@ -153,18 +139,20 @@ const noBtn = document.getElementById("noBtn");
 const bgMusic = document.getElementById("bgMusic");
 const popSound = document.getElementById("popSound");
 
+// Start music on first click
 document.body.addEventListener("click", () => {
   bgMusic.volume = 0.5;
   bgMusic.play().catch(()=>{});
 },{once:true});
 
+// Spawn hearts
 function spawnHeart(){
   const h = document.createElement("div");
   h.textContent = "💙";
   h.style.position="fixed";
   h.style.left=Math.random()*window.innerWidth+"px";
   h.style.top=Math.random()*window.innerHeight+"px";
-  h.style.fontSize="30px";
+  h.style.fontSize=(24 + Math.random()*20)+"px";
   document.body.appendChild(h);
 
   h.onclick=()=>{
@@ -176,43 +164,54 @@ function spawnHeart(){
     h.remove();
 
     if(hearts===total){
-      yesBtn.disabled=false;
-      yesBtn.classList.add("unlocked");
-      instructions.innerText="YES unlocked 💙";
-      popNoButton();
+      unlockYes();
     }
   };
   setTimeout(()=>h.remove(),5000);
 }
 
+// Pop message
 function popMsg(el){
-  const m=document.createElement("div");
+  const m = document.createElement("div");
   m.className="popMessage";
   m.innerText=messages[Math.floor(Math.random()*messages.length)];
-  m.style.left=el.offsetLeft+"px";
-  m.style.top=el.offsetTop+"px";
+  const rect = el.getBoundingClientRect();
+  m.style.left = rect.left + "px";
+  m.style.top = rect.top + "px";
   document.body.appendChild(m);
   setTimeout(()=>m.remove(),1000);
 }
 
+// Heart interval
 setInterval(spawnHeart,1200);
 
-// NO BUTTON RUNS ON HOVER
+// NO button runs away before YES unlocked
 noBtn.addEventListener("mouseenter",()=>{
-  const x=Math.random()*(window.innerWidth-100);
-  const y=Math.random()*(window.innerHeight-50);
-  noBtn.style.position="absolute";
-  noBtn.style.left=x+"px";
-  noBtn.style.top=y+"px";
+  if(!yesBtn.classList.contains("unlocked")){
+    noBtn.style.position="absolute";
+    const x = Math.random()*(window.innerWidth - noBtn.offsetWidth);
+    const y = Math.random()*(window.innerHeight - noBtn.offsetHeight);
+    noBtn.style.left = x + "px";
+    noBtn.style.top = y + "px";
+  }
 });
 
+// Unlock YES
+function unlockYes(){
+  yesBtn.disabled=false;
+  yesBtn.classList.add("unlocked");
+  instructions.innerText="YES unlocked 💙";
+  popNoButton();
+}
+
+// Pop NO button with confetti
 function popNoButton(){
   const rect=noBtn.getBoundingClientRect();
   for(let i=0;i<25;i++){
     const c=document.createElement("div");
     c.className="confetti";
-    c.style.left=rect.left+"px";
-    c.style.top=rect.top+"px";
+    c.style.left=rect.left + "px";
+    c.style.top=rect.top + "px";
     c.style.background=["#ff5e78","#4da3ff","#ffd166"][Math.floor(Math.random()*3)];
     document.body.appendChild(c);
     setTimeout(()=>c.remove(),1200);
@@ -220,19 +219,21 @@ function popNoButton(){
   noBtn.remove();
 }
 
+// Rain hearts/petals
 function rain(symbol,count){
   for(let i=0;i<count;i++){
     const r=document.createElement("div");
     r.className="rain";
     r.textContent=symbol;
     r.style.left=Math.random()*window.innerWidth+"px";
-    r.style.fontSize="30px";
+    r.style.fontSize=(20+Math.random()*20)+"px";
     r.style.animationDuration=(3+Math.random()*3)+"s";
     document.body.appendChild(r);
     setTimeout(()=>r.remove(),6000);
   }
 }
 
+// YES click
 yesBtn.onclick=()=>{
   rain("💙",40);
   rain("🌸",30);
